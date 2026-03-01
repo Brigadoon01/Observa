@@ -7,7 +7,7 @@ Production-grade observability SDK for Node.js. Structured logging, distributed 
 ## Installation
 
 ```bash
-npm install @emperorwilliams/nodeobserve
+npm install @jeremiah01/observa
 ```
 
 Node 18+ required.
@@ -17,7 +17,7 @@ Node 18+ required.
 ## Quick Start
 
 ```typescript
-import { ObserveSDK, SlackTransport, FileTransport, ConsoleSpanExporter } from '@emperorwilliams/nodeobserve';
+import { ObserveSDK, SlackTransport, FileTransport, ConsoleSpanExporter } from '@jeremiah01/observa';
 
 const observe = ObserveSDK.init({
   service: 'my-service',
@@ -109,7 +109,7 @@ You can connect NodeObserve to any logging or alerting backend (Datadog, Splunk,
 ### 1. Implement the Transport
 
 ```typescript
-import { Transport, LogEntry, Alert } from '@emperorwilliams/nodeobserve';
+import { Transport, LogEntry, Alert } from '@jeremiah01/observa';
 
 export class MyCustomTransport implements Transport {
   readonly id = 'my-custom-platform';

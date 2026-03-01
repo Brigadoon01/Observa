@@ -1,5 +1,5 @@
 {
-  "name": "@emperorwilliams/nodeobserve",
+  "name": "@jeremiah01/observa",
   "version": "1.0.0",
   "description": "Production-grade observability SDK for Node.js — logging, tracing, alerting",
   "main": "dist/index.js",
@@ -10,6 +10,14 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
@@ -28,6 +36,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "@jeremiah01/observa": "^1.0.0",
     "uuid": "^9.0.0",
     "zod": "^3.22.4"
   },
@@ -45,7 +54,7 @@
     "vitest": "^1.0.0"
   },
   "peerDependencies": {
-    "express": ">=4.0.0"
+    "express": "^5.2.1"
   },
   "peerDependenciesMeta": {
     "express": {
