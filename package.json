@@ -1,6 +1,6 @@
 {
   "name": "@jeremiah01/observa",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Production-grade observability SDK for Node.js — logging, tracing, alerting",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -37,6 +37,9 @@
   "license": "MIT",
   "dependencies": {
     "@jeremiah01/observa": "^1.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "jsonwebtoken": "^9.0.3",
+    "sqlite3": "^5.1.7",
     "uuid": "^9.0.0",
     "zod": "^3.22.4"
   },

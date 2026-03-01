@@ -130,6 +130,26 @@ export interface ObserveConfig {
     logLevel?: LogLevel; // Level to log metrics at (default: info)
     system?: boolean; // Enable system metrics (CPU/Memory)
   };
+
+  dashboard?: {
+    enabled: boolean;
+    port?: number;
+    host?: string;
+    storage?: MetricsStorage; // Custom storage provider
+    auth?: {
+      type: 'basic' | 'jwt';
+      user?: string; // For Basic
+      pass?: string; // For Basic
+      jwtSecret?: string; // For JWT
+    };
+  };
+}
+
+export interface MetricsStorage {
+  saveMetric(metric: MetricValue): void | Promise<void>;
+  saveLog(log: LogEntry): void | Promise<void>;
+  getMetrics(limit: number): Promise<MetricValue[]>;
+  getLogs(limit: number): Promise<LogEntry[]>;
 }
 
 export interface SpanExporter {

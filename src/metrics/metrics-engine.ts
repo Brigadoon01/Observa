@@ -68,6 +68,7 @@ export class MetricsEngine {
   private readonly enabled: boolean;
   private readonly logLevel: LogLevel;
   private timer: NodeJS.Timeout | null = null;
+  private onFlush?: (metrics: MetricValue[]) => void;
 
   constructor(config: ObserveConfig, logger: Logger) {
     this.logger = logger;
@@ -78,6 +79,10 @@ export class MetricsEngine {
     if (this.enabled) {
       this.startFlushTimer();
     }
+  }
+
+  public setOnFlush(callback: (metrics: MetricValue[]) => void) {
+    this.onFlush = callback;
   }
 
   private getKey(name: string, tags: Record<string, string>): string {
@@ -157,6 +162,11 @@ export class MetricsEngine {
     }
 
     if (metrics.length === 0) return;
+
+    // Notify listeners (Dashboard)
+    if (this.onFlush) {
+      this.onFlush(metrics);
+    }
 
     // Log metrics
     // We log them as a special event type so backends can parse them

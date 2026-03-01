@@ -15,7 +15,31 @@ import {
 const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL;
 const alertChannels = slackWebhookUrl ? ['console', 'slack'] : ['console'];
 
-// 1. Initialize SDK
+// 1. Define custom storage (optional)
+class InMemoryStorage {
+  private metrics: any[] = [];
+  private logs: any[] = [];
+
+  saveMetric(metric: any) {
+    this.metrics.push(metric);
+    if (this.metrics.length > 1000) this.metrics.shift();
+  }
+
+  saveLog(log: any) {
+    this.logs.push(log);
+    if (this.logs.length > 1000) this.logs.shift();
+  }
+
+  async getMetrics(limit: number) {
+    return this.metrics.slice(-limit).reverse();
+  }
+
+  async getLogs(limit: number) {
+    return this.logs.slice(-limit).reverse();
+  }
+}
+
+// 2. Initialize SDK
 console.log('🚀 Initializing Observability SDK...');
 const observe = ObserveSDK.init({
   service: 'payment-service',
@@ -39,8 +63,22 @@ const observe = ObserveSDK.init({
   // METRICS: Track business KPIs & System Health
   metrics: {
     enabled: true,
-    intervalMs: 5000, // Flush metrics every 5s
+    intervalMs: 2000, // Flush metrics every 2s for fast dashboard updates
     system: true      // CPU/Memory stats
+  },
+
+  // DASHBOARD: Real-time visualization
+  dashboard: {
+    enabled: true,
+    port: 3001,
+    host: '0.0.0.0', 
+    // storage: new InMemoryStorage(), // Uncomment to use custom storage instead of SQLite
+    auth: {
+      type: 'jwt',
+      user: 'admin',
+      pass: 'secret',
+      jwtSecret: 'super-secure-jwt-key-change-me'
+    }
   },
 
   // ALERTING: Detect anomalies

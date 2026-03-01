@@ -105,6 +105,7 @@ export class Logger {
   private flushTimer: NodeJS.Timeout | null = null;
   private readonly boundContext: Record<string, unknown>;
   private readonly onEntry?: (entry: LogEntry) => void | Promise<void>;
+  private onLog?: (entry: LogEntry) => void;
 
   constructor(
     config: ObserveConfig,
@@ -128,6 +129,10 @@ export class Logger {
 
   getService(): string {
     return this.service;
+  }
+
+  setOnLog(callback: (entry: LogEntry) => void) {
+    this.onLog = callback;
   }
 
   getEnvironment(): string | undefined {
@@ -243,6 +248,19 @@ export class Logger {
 
     if (this.onEntry) {
       void Promise.resolve(this.onEntry(entry)).catch(() => undefined);
+    }
+
+    if (this.onLog) {
+      // Create a clean copy without circular references or large objects if needed
+      // For now, passing entry is fine as it's already structured
+      try {
+        // Deep clone to avoid mutation issues if the callback modifies it
+        // and to ensure it's serializable
+        const cleanEntry = JSON.parse(JSON.stringify(entry));
+        this.onLog(cleanEntry);
+      } catch (e) {
+        // ignore serialization errors
+      }
     }
   }
 

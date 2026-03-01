@@ -3,6 +3,7 @@ import { Tracer } from './tracer/tracer';
 import { AlertEngine } from './alerting/alert-engine';
 import { MetricsEngine } from './metrics/metrics-engine';
 import { SystemMonitor } from './metrics/system-monitor';
+import { DashboardServer } from './dashboard/dashboard-server';
 import { createObserveMiddleware, ObserveMiddlewareOptions } from './middleware/express';
 import type { ObserveConfig, LogEntry } from './types';
 
@@ -21,6 +22,7 @@ export class ObserveSDK {
   public readonly alertEngine: AlertEngine;
   public readonly metrics: MetricsEngine;
   private readonly systemMonitor?: SystemMonitor;
+  private readonly dashboard?: DashboardServer;
   private static instance: ObserveSDK;
 
   private constructor(config: ObserveConfig) {
@@ -41,6 +43,18 @@ export class ObserveSDK {
         config.metrics?.intervalMs ?? 60_000
       );
       this.systemMonitor.start();
+    }
+
+    if (config.dashboard?.enabled) {
+      this.dashboard = new DashboardServer(
+        this.metrics, 
+        this.logger,
+        config.dashboard.port,
+        config.dashboard.host,
+        config.dashboard.auth,
+        config.dashboard.storage
+      );
+      this.dashboard.start();
     }
   }
 

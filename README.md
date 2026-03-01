@@ -40,6 +40,16 @@ const observe = ObserveSDK.init({
     intervalMs: 60_000,
   },
 
+  dashboard: {
+    enabled: true,
+    port: 3001,
+    host: '0.0.0.0', // Optional: Allow external access
+    auth: {
+      user: 'admin',
+      pass: 'secret'
+    }
+  },
+
   alerting: {
     rules: [{
       id: 'errors',
@@ -59,6 +69,54 @@ const observe = ObserveSDK.init({
 // Express
 app.use(observe.middleware({ ignorePaths: ['/health'] }));
 ```
+
+---
+
+## Real-time Dashboard
+
+NodeObserve comes with a built-in lightweight dashboard to visualize metrics and stream logs in real-time.
+
+**Features:**
+- 📈 Live System Charts (CPU, Memory)
+- 🔢 Real-time Custom Metrics (Counters, Gauges)
+- 📝 Live Log Streaming (Tail logs directly in the browser)
+- 🔒 Basic Authentication & External Access
+
+### Configuration
+
+```typescript
+dashboard: {
+    enabled: true,
+    port: 3001,      // Default: 3001
+    host: '0.0.0.0', // Default: 0.0.0.0 (Listen on all interfaces)
+    auth: {          
+      type: 'jwt',
+      user: 'admin',
+      pass: 'secure-password',
+      jwtSecret: 'my-secret-key'
+    },
+    // storage: new MyCustomStorage() // Optional: Custom storage provider
+  }
+}
+```
+
+### Data Persistence
+By default, the dashboard uses **SQLite** (`observa.db`) to persist metrics and logs. This ensures data survives application restarts.
+
+To use a custom storage provider (e.g., Redis, Postgres), implement the `MetricsStorage` interface:
+
+```typescript
+import { MetricsStorage, MetricValue, LogEntry } from '@jeremiah01/observa';
+
+class MyStorage implements MetricsStorage {
+  async saveMetric(metric: MetricValue) { /* ... */ }
+  async saveLog(log: LogEntry) { /* ... */ }
+  async getMetrics(limit: number) { /* ... */ }
+  async getLogs(limit: number) { /* ... */ }
+}
+```
+
+Access the dashboard at `http://localhost:3001` (or your server IP).
 
 ---
 
@@ -168,6 +226,8 @@ ObserveSDK
 ├── Tracer               — W3C traceparent, AsyncLocalStorage propagation
 │   └── Exporters        — Console | HTTP (OTLP-lite, Jaeger-compatible)
 ├── Metrics              — Counters | Gauges | Histograms | System Monitor
+│   └── Dashboard        — Live visualization server (SSE + Chart.js)
+├── Storage              — SQLite persistence & Custom storage interface
 ├── AlertEngine          — Rule evaluation, sliding windows, cooldowns, fanout
 └── Middleware (Express) — Auto trace/log injection per request
 ```
